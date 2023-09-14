@@ -20,7 +20,7 @@ export async function activate(context: ExtensionContext) {
     
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
-        // Register the server for java documents
+        // Register the server for java LanguageClient documents
         documentSelector: [{scheme: 'file', language: 'java'}],
         synchronize: {
             // Synchronize the setting section 'java' to the server

@@ -2,6 +2,8 @@ package org.javacs;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.*;
+import com.sun.tools.javac.tree.JCTree;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,8 +35,9 @@ class CompileBatch implements AutoCloseable {
         this.elements = borrow.task.getElements();
         this.types = borrow.task.getTypes();
         this.roots = new ArrayList<>();
-        // Compile all roots
+
         try {
+
             for (var t : borrow.task.parse()) {
                 roots.add(t);
             }
@@ -78,6 +81,7 @@ class CompileBatch implements AutoCloseable {
         var file = Paths.get(err.getSource().toUri());
         return FileStore.packageName(file);
     }
+
 
     private static final Path FILE_NOT_FOUND = Paths.get("");
 

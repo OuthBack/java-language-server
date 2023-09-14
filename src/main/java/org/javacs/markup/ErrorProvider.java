@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
@@ -30,6 +31,7 @@ public class ErrorProvider {
             result[i].diagnostics.addAll(compilerErrors(root));
             result[i].diagnostics.addAll(unusedWarnings(root));
             result[i].diagnostics.addAll(notThrownWarnings(root));
+            result[i].diagnostics.addAll(conditionWarnings(root));
         }
         // TODO hint fields that could be final
 
@@ -62,6 +64,17 @@ public class ErrorProvider {
         new WarnNotThrown(task.task).scan(root, notThrown);
         for (var location : notThrown.keySet()) {
             result.add(warnNotThrown(notThrown.get(location), location));
+        }
+        return result;
+    }
+
+    private List<org.javacs.lsp.Diagnostic> conditionWarnings(CompilationUnitTree root) {
+        var result = new ArrayList<org.javacs.lsp.Diagnostic>();
+        WarnCondition warnConditions = new WarnCondition(task.task);
+        warnConditions.scan(root, null);
+
+        for (var conditionElement: warnConditions.getConditionPaths().entrySet()) {
+            result.add(warnConditional(conditionElement.getKey(), conditionElement.getValue()));
         }
         return result;
     }
@@ -180,6 +193,23 @@ public class ErrorProvider {
         return lspWarnUnused(severity, code, message, start, end, root);
     }
 
+    private org.javacs.lsp.Diagnostic warnConditional(TreePath path, String expression) {
+        var trees = Trees.instance(task.task);
+
+        if (path == null) {
+            throw new RuntimeException("Conditional has no path");
+        }
+        var root = path.getCompilationUnit();
+        var leaf = path.getLeaf();
+        var pos = trees.getSourcePositions();
+        var start = (int) pos.getStartPosition(root, leaf);
+        var end = (int) pos.getEndPosition(root, leaf);
+        var file = Paths.get(root.getSourceFile().toUri());
+        var contents = FileStore.contents(file);
+        var message = String.format("Condition is always '%s'", expression);
+        return lspWarnUnused(DiagnosticSeverity.Warning, "condition_always", message, start, end, root);
+    }
+
     private static org.javacs.lsp.Diagnostic lspWarnUnused(
             int severity, String code, String message, int start, int end, CompilationUnitTree root) {
         var result = new org.javacs.lsp.Diagnostic();
@@ -190,4 +220,6 @@ public class ErrorProvider {
         result.range = RangeHelper.range(root, start, end);
         return result;
     }
+
+    private static final Logger LOG = Logger.getLogger("main");
 }

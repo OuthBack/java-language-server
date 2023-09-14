@@ -4,6 +4,7 @@ import com.sun.source.util.Trees;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
@@ -41,6 +42,7 @@ public class DefinitionProvider {
                 return findDefinitions(task, element);
             }
             var className = className(element);
+            LOG.info(className);
             if (className.isEmpty()) return NOT_SUPPORTED;
             var otherFile = compiler.findAnywhere(className);
             if (otherFile.isEmpty()) return List.of();
@@ -115,4 +117,5 @@ public class DefinitionProvider {
         if (name.contentEquals("<init>")) name = element.getEnclosingElement().getSimpleName();
         return List.of(FindHelper.location(task, path, name));
     }
+    private static final Logger LOG = Logger.getLogger("main");
 }

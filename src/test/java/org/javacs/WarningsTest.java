@@ -96,6 +96,13 @@ public class WarningsTest {
     }
 
     @Test
+    public void conditionalAlways() {
+        server.lint(List.of(FindResource.path("org/javacs/warn/ConditionAlways.java")));
+        assertThat(errors, hasItem("condition_always(5)")); // if(true){]
+        assertThat(errors, hasItem("condition_always(9)")); // if(false){]
+    }
+
+    @Test
     public void pseudoUsed() {
         server.lint(List.of(FindResource.path("org/javacs/warn/PseudoUsed.java")));
         assertThat(errors, not(hasItem("unused_method(8)"))); // void pseudoUsed(int)

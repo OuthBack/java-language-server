@@ -198,13 +198,14 @@ public class LSP {
                 while (true) {
                     try {
                         var token = nextToken(receive);
+
                         var message = parseMessage(token);
                         peek(message);
                         pending.put(message);
                     } catch (EndOfStream __) {
                         if (kill()) return;
                     } catch (Exception e) {
-                        LOG.log(Level.SEVERE, e.getMessage(), e);
+                        LOG.severe(e.getMessage());
                     }
                 }
             }

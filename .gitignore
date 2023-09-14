@@ -6,6 +6,7 @@
 /dist/mac
 /dist/windows
 /jdks
+/scripts/jdks
 
 /dependency-reduced-pom.xml
 /classpath.txt
