@@ -1,3 +1,16 @@
+# What I did in this fork
+- Implemented a lint checker when a conditional is always true or always false like in IntelliJ
+Example:
+```java
+if(true){ // Warning: Always true
+  ...
+}
+
+while(false){ // Warning: Always false
+  ...
+}
+```
+
 # Language Server for Java using the [Java compiler API](https://docs.oracle.com/javase/10/docs/api/jdk.compiler-summary.html)
 
 A Java [language server](https://github.com/Microsoft/vscode-languageserver-protocol) based on v3.0 of the protocol and implemented using the Java compiler API.
